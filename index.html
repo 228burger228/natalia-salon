@@ -1,56 +1,115 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Салон красоты Наталья</title>
   <style>
     body { margin:0; font-family: Arial, sans-serif; background: #faf7f5; color:#333; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; background:white; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:sticky; top:0; z-index:10; }
-    .menu a { margin-right:20px; text-decoration:none; color:#333; font-weight:500; }
-    .btn { padding:10px 18px; background:#b77aa5; color:white; border-radius:6px; cursor:pointer; border:none; }
-    .hero { text-align:center; padding:140px 20px; background:url('https://images.unsplash.com/photo-1612215581363-1b7db6f21230?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDF8fGJlYXV0eSUyMGNhcmV8ZW58MHx8fHwxNjUyMjUyNzY2&ixlib=rb-4.0.3&q=80&w=1080') center/cover no-repeat; color:white; text-shadow:0 2px 10px rgba(0,0,0,0.5); }
+    a { text-decoration:none; color:inherit; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100; }
+    .menu a { margin-right:20px; font-weight:500; }
+    .btn { padding:10px 18px; background:#b77aa5; color:white; border-radius:6px; cursor:pointer; }
+    .hero { text-align:center; padding:140px 20px; background:url('https://images.unsplash.com/photo-1612197525705-7f2d03b60b77?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat; color:white; text-shadow:0 2px 10px rgba(0,0,0,0.5); }
     .hero h1 { font-size:60px; margin-bottom:10px; }
     .hero p { font-size:24px; }
-    #root { padding:40px; max-width:1200px; margin:0 auto; }
-    .section-title { font-size:28px; margin-bottom:20px; font-weight:bold; }
-    .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
-    .card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+    section { padding:60px 20px; max-width:1200px; margin:auto; }
+    h2 { font-size:32px; margin-bottom:20px; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+    .card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1); display:flex; flex-direction:column; }
     .card img { width:100%; height:180px; object-fit:cover; }
-    .card-content { padding:15px; }
-    .card-content h4 { margin:0 0 8px; }
-    .card-content p { font-size:14px; color:#555; margin:0 0 10px; }
-    .card-content .price { font-weight:bold; }
-    .card-content .card-btn { margin-top:10px; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; background:#b77aa5; color:white; }
-
+    .card-body { padding:15px; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
+    footer { background:#333; color:#eee; padding:40px 20px; margin-top:60px; }
+    footer h3 { color:#fff; margin-bottom:10px; }
+    footer ul { list-style:none; padding:0; }
+    footer ul li { margin-bottom:6px; }
+    .breadcrumbs { font-size:14px; margin-bottom:20px; color:#555; }
+    .breadcrumbs a { color:#b77aa5; }
     /* Modal */
-    #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-    #modal .modal-content { background:white; padding:20px; width:380px; border-radius:10px; max-height:90vh; overflow:auto; }
-    #modal label { display:block; margin-top:10px; font-weight:500; }
-    #modal input, #modal select { width:100%; padding:6px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
-    #modal .modal-btn { margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background:#b77aa5; color:white; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
+    .modal-content { background:white; padding:20px; width:400px; border-radius:10px; max-height:90vh; overflow:auto; }
+    .modal-content label { display:block; margin-top:10px; font-weight:500; }
+    .modal-content input, .modal-content select { width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
+    .modal-content button { margin-top:10px; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; }
+    .modal-content .close { background:#ccc; color:#000; margin-top:5px; }
+    .breadcrumbs span { margin:0 5px; }
   </style>
 </head>
 <body>
+
 <header>
-  <div class="logo">Салон "Наталья"</div>
+  <div class="logo"><strong>Наталья</strong> — салон красоты</div>
   <nav class="menu">
     <a href="#services">Услуги</a>
     <a href="#masters">Мастера</a>
     <a href="#branches">Филиалы</a>
+    <a href="#contacts">Контакты</a>
   </nav>
-  <button class="btn" onclick="openModal()">Записаться</button>
+  <div class="btn" onclick="openModal()">Записаться</div>
 </header>
 
 <section class="hero">
-  <h1>Салон красоты Наталья</h1>
+  <h1>Наталья</h1>
   <p>Гармония, стиль и уверенность каждый день</p>
 </section>
 
-<div id="root"></div>
+<div class="breadcrumbs" id="breadcrumbs">
+  <a href="#">Главная</a> <span>›</span> <span id="crumb-current">Услуги</span>
+</div>
+
+<section id="services">
+  <h2>Категории услуг</h2>
+  <div class="cards" id="services-cards"></div>
+</section>
+
+<section id="masters">
+  <h2>Наши мастера</h2>
+  <div class="cards" id="masters-cards"></div>
+</section>
+
+<section id="branches">
+  <h2>Филиалы салона</h2>
+  <div class="cards" id="branches-cards"></div>
+</section>
+
+<footer id="contacts">
+  <div style="display:flex; flex-wrap:wrap; gap:40px;">
+    <div>
+      <h3>Наталья</h3>
+      <p>© 2025 Салон красоты Наталья. Все права защищены.</p>
+    </div>
+    <div>
+      <h3>Соцсети</h3>
+      <ul>
+        <li>Instagram</li>
+        <li>VK</li>
+        <li>WhatsApp</li>
+        <li>Telegram</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Покупателям</h3>
+      <ul>
+        <li>Акции</li>
+        <li>Блог</li>
+        <li>Подарочные сертификаты</li>
+        <li>Вопрос-ответ</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Партнёрам</h3>
+      <ul>
+        <li>Франчайзинг</li>
+        <li>Поставщики</li>
+        <li>Корпоративным клиентам</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:20px; font-size:12px;">Соглашение с политикой конфиденциальности и сбором cookie</p>
+</footer>
 
 <!-- Modal -->
-<div id="modal">
+<div class="modal" id="modal">
   <div class="modal-content">
     <h3>Запись на услугу</h3>
     <label>Услуга:</label>
@@ -60,91 +119,82 @@
     <label>Мастер:</label>
     <select id="modal-master"></select>
     <label>Дата и время:</label>
-    <input type="datetime-local" id="modal-datetime" />
+    <input type="datetime-local" id="modal-datetime">
     <label>Контактные данные:</label>
-    <input type="text" id="modal-contact" placeholder="Имя, телефон или email" />
-    <button class="modal-btn" onclick="confirmBooking()">Записаться</button>
-    <button class="modal-btn" style="background:#ccc;color:#000;margin-top:5px;" onclick="closeModal()">Закрыть</button>
+    <input type="text" id="modal-contact" placeholder="Имя, телефон или почта">
+    <button class="btn" onclick="confirmBooking()">Записаться</button>
+    <button class="close" onclick="closeModal()">Закрыть</button>
   </div>
 </div>
 
 <script>
-// Данные
-const SERVICES = [
-  {name:'Маникюр', items:[
-    {name:'Классический маникюр', desc:'Аккуратная обработка кутикулы и покрытие лаком', price:800,img:'https://images.unsplash.com/photo-1600180758890-31a2e1fa3a20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'},
-    {name:'Французский маникюр', desc:'Элегантный френч с глянцевым покрытием', price:1000,img:'https://images.unsplash.com/photo-1596484575763-7a897ff88d22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
-  {name:'Педикюр', items:[
-    {name:'Европейский педикюр', desc:'Расслабляющая ванночка и покрытие', price:1200,img:'https://images.unsplash.com/photo-1590031905476-d0c0b63f71b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
-  {name:'Прически', items:[
-    {name:'Свадебная прическа', desc:'Элегантная укладка для особого события', price:2500,img:'https://images.unsplash.com/photo-1607746882042-944635dfe10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
-  {name:'Макияж', items:[
-    {name:'Вечерний макияж', desc:'Стойкий макияж с учётом особенностей лица', price:1500,img:'https://images.unsplash.com/photo-1590080878836-768a69f215e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
-  {name:'Уход за красотой', items:[
-    {name:'Массаж лица', desc:'Расслабляющий уход за кожей', price:1000,img:'https://images.unsplash.com/photo-1598899134739-f9c23801ec4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]}
+const services = [
+  {name:"Маникюр", items:[...Array(10).keys()].map(i=>({name:`Маникюр ${i+1}`, price:800+i*50, img:`https://source.unsplash.com/400x300/?manicure,${i}`}))},
+  {name:"Педикюр", items:[...Array(10).keys()].map(i=>({name:`Педикюр ${i+1}`, price:1000+i*50, img:`https://source.unsplash.com/400x300/?pedicure,${i}`}))},
+  {name:"Прически", items:[...Array(12).keys()].map(i=>({name:`Прическа ${i+1}`, price:1500+i*100, img:`https://source.unsplash.com/400x300/?hairstyle,${i}`}))},
+  {name:"Макияж", items:[...Array(11).keys()].map(i=>({name:`Макияж ${i+1}`, price:1200+i*80, img:`https://source.unsplash.com/400x300/?makeup,${i}`}))},
+  {name:"Уход за красотой", items:[...Array(10).keys()].map(i=>({name:`Уход ${i+1}`, price:900+i*70, img:`https://source.unsplash.com/400x300/?spa,${i}`}))},
 ];
 
-const MASTERS = [
-  {name:'Анастасия', category:'Маникюр', exp:'5 лет'},
-  {name:'Екатерина', category:'Педикюр', exp:'7 лет'},
-  {name:'Мария', category:'Прически', exp:'10 лет'}
+const masters = [...Array(12).keys()].map(i=>({name:`Мастер ${i+1}`, category:services[i%5].name, img:`https://source.unsplash.com/400x300/?woman,${i}`}))
+
+const branches = [
+  {name:"Центр", address:"ул. Ленина, 10", metro:"Центральная", img:"https://source.unsplash.com/400x300/?salon,1"},
+  {name:"Садовая", address:"с-б Садовая, 5", metro:"Садовая", img:"https://source.unsplash.com/400x300/?salon,2"},
+  {name:"Победа", address:"пр. Победы, 24", metro:"Победа", img:"https://source.unsplash.com/400x300/?salon,3"},
+  {name:"Невский", address:"наб. Невы, 3", metro:"Невский", img:"https://source.unsplash.com/400x300/?salon,4"},
+  {name:"Северный", address:"ул. Северная, 16", metro:"Северная", img:"https://source.unsplash.com/400x300/?salon,5"},
 ];
 
-const BRANCHES = [
-  {name:'Наталья — Центр', addr:'ул. Ленина, 10'},
-  {name:'Наталья — Садовая', addr:'с-б Садовая, 5'}
-];
+// Render services
+const servicesContainer = document.getElementById("services-cards");
+services.forEach(cat=>{
+  cat.items.forEach(s=>{
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<img src="${s.img}" alt="${s.name}"><div class="card-body"><strong>${s.name}</strong><p>${s.price} ₽</p><button class="btn" onclick="openModal('${s.name}')">Записаться</button></div>`;
+    servicesContainer.appendChild(card);
+  });
+});
 
-// Функции модалки
-function openModal(){ document.getElementById('modal').style.display='flex'; populateModal(); }
-function closeModal(){ document.getElementById('modal').style.display='none'; }
-function confirmBooking(){ alert('Запись подтверждена!'); closeModal(); }
+// Render masters
+const mastersContainer = document.getElementById("masters-cards");
+masters.forEach(m=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<img src="${m.img}" alt="${m.name}"><div class="card-body"><strong>${m.name}</strong><p>${m.category}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+  mastersContainer.appendChild(card);
+});
+
+// Render branches
+const branchesContainer = document.getElementById("branches-cards");
+branches.forEach(b=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<img src="${b.img}" alt="${b.name}"><div class="card-body"><strong>${b.name}</strong><p>${b.address}</p><p>Метро: ${b.metro}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+  branchesContainer.appendChild(card);
+});
+
+// Modal logic
+const modal=document.getElementById("modal");
+const modalService=document.getElementById("modal-service");
+const modalBranch=document.getElementById("modal-branch");
+const modalMaster=document.getElementById("modal-master");
 function populateModal(){
-  const serviceSel = document.getElementById('modal-service');
-  const branchSel = document.getElementById('modal-branch');
-  const masterSel = document.getElementById('modal-master');
-  serviceSel.innerHTML=''; branchSel.innerHTML=''; masterSel.innerHTML='';
-  SERVICES.forEach(s=>s.items.forEach(i=>{ let opt=document.createElement('option'); opt.value=i.name; opt.text=`${i.name} — ${i.price} ₽`; serviceSel.add(opt); }));
-  BRANCHES.forEach(b=>{ let opt=document.createElement('option'); opt.value=b.name; opt.text=b.name; branchSel.add(opt); });
-  MASTERS.forEach(m=>{ let opt=document.createElement('option'); opt.value=m.name; opt.text=`${m.name} — ${m.category}`; masterSel.add(opt); });
+  modalService.innerHTML=""; services.forEach(s=>{const o=document.createElement("option"); o.value=s.name; o.text=s.name; modalService.appendChild(o);})
+  modalBranch.innerHTML=""; branches.forEach(b=>{const o=document.createElement("option"); o.value=b.name; o.text=b.name; modalBranch.appendChild(o);})
+  modalMaster.innerHTML=""; masters.forEach(m=>{const o=document.createElement("option"); o.value=m.name; o.text=m.name; modalMaster.appendChild(o);})
 }
+function openModal(serviceName="") { populateModal(); if(serviceName) modalService.value=serviceName; modal.style.display="flex"; }
+function closeModal() { modal.style.display="none"; }
+function confirmBooking() { alert(`Ваша запись подтверждена!\nУслуга: ${modalService.value}\nФилиал: ${modalBranch.value}\nМастер: ${modalMaster.value}`); closeModal(); }
 
-// Генерация контента
-const root=document.getElementById('root');
+// Breadcrumb update
+const crumbs=document.querySelectorAll(".menu a");
+const crumbCurrent=document.getElementById("crumb-current");
+crumbs.forEach(c=>{c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}}));
 
-// Услуги
-const servSec=document.createElement('section');
-servSec.id='services';
-servSec.innerHTML='<h2 class="section-title">Категории услуг</h2>';
-const servCards=document.createElement('div'); servCards.className='cards';
-SERVICES.forEach(cat=>cat.items.forEach(i=>{
-  const card=document.createElement('div'); card.className='card';
-  card.innerHTML=`<img src="${i.img}" alt="${i.name}"><div class="card-content"><h4>${i.name}</h4><p>${i.desc}</p><div class="price">${i.price} ₽</div><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
-  servCards.appendChild(card);
-}));
-servSec.appendChild(servCards); root.appendChild(servSec);
-
-// Мастера
-const mastSec=document.createElement('section');
-mastSec.id='masters'; mastSec.innerHTML='<h2 class="section-title">Наши мастера</h2>';
-const mastCards=document.createElement('div'); mastCards.className='cards';
-MASTERS.forEach(m=>{
-  const card=document.createElement('div'); card.className='card';
-  card.innerHTML=`<img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" alt="${m.name}"><div class="card-content"><h4>${m.name}</h4><p>Специализация: ${m.category}</p><p>Стаж: ${m.exp}</p><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
-  mastCards.appendChild(card);
-});
-mastSec.appendChild(mastCards); root.appendChild(mastSec);
-
-// Филиалы
-const branchSec=document.createElement('section');
-branchSec.id='branches'; branchSec.innerHTML='<h2 class="section-title">Филиалы</h2>';
-const branchCards=document.createElement('div'); branchCards.className='cards';
-BRANCHES.forEach(b=>{
-  const card=document.createElement('div'); card.className='card';
-  card.innerHTML=`<img src="https://images.unsplash.com/photo-1618210640610-dff01c9f3911?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" alt="${b.name}"><div class="card-content"><h4>${b.name}</h4><p>${b.addr}</p><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
-  branchCards.appendChild(card);
-});
-branchSec.appendChild(branchCards); root.appendChild(branchSec);
 </script>
+
 </body>
 </html>
