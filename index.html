@@ -126,73 +126,7 @@
     <button class="close" onclick="closeModal()">Закрыть</button>
   </div>
 </div>
-
 <script>
-const services = [
-  {name:"Маникюр", items:[...Array(10).keys()].map(i=>({name:`Маникюр ${i+1}`, price:800+i*50, img:`https://source.unsplash.com/400x300/?manicure,${i}`}))},
-  {name:"Педикюр", items:[...Array(10).keys()].map(i=>({name:`Педикюр ${i+1}`, price:1000+i*50, img:`https://source.unsplash.com/400x300/?pedicure,${i}`}))},
-  {name:"Прически", items:[...Array(12).keys()].map(i=>({name:`Прическа ${i+1}`, price:1500+i*100, img:`https://source.unsplash.com/400x300/?hairstyle,${i}`}))},
-  {name:"Макияж", items:[...Array(11).keys()].map(i=>({name:`Макияж ${i+1}`, price:1200+i*80, img:`https://source.unsplash.com/400x300/?makeup,${i}`}))},
-  {name:"Уход за красотой", items:[...Array(10).keys()].map(i=>({name:`Уход ${i+1}`, price:900+i*70, img:`https://source.unsplash.com/400x300/?spa,${i}`}))},
-];
-
-const masters = [...Array(12).keys()].map(i=>({name:`Мастер ${i+1}`, category:services[i%5].name, img:`https://source.unsplash.com/400x300/?woman,${i}`}))
-
-const branches = [
-  {name:"Центр", address:"ул. Ленина, 10", metro:"Центральная", img:"https://source.unsplash.com/400x300/?salon,1"},
-  {name:"Садовая", address:"с-б Садовая, 5", metro:"Садовая", img:"https://source.unsplash.com/400x300/?salon,2"},
-  {name:"Победа", address:"пр. Победы, 24", metro:"Победа", img:"https://source.unsplash.com/400x300/?salon,3"},
-  {name:"Невский", address:"наб. Невы, 3", metro:"Невский", img:"https://source.unsplash.com/400x300/?salon,4"},
-  {name:"Северный", address:"ул. Северная, 16", metro:"Северная", img:"https://source.unsplash.com/400x300/?salon,5"},
-];
-
-// Render services
-const servicesContainer = document.getElementById("services-cards");
-services.forEach(cat=>{
-  cat.items.forEach(s=>{
-    const card = document.createElement("div");
-    card.className="card";
-    card.innerHTML=`<img src="${s.img}" alt="${s.name}"><div class="card-body"><strong>${s.name}</strong><p>${s.price} ₽</p><button class="btn" onclick="openModal('${s.name}')">Записаться</button></div>`;
-    servicesContainer.appendChild(card);
-  });
-});
-
-// Render masters
-const mastersContainer = document.getElementById("masters-cards");
-masters.forEach(m=>{
-  const card = document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<img src="${m.img}" alt="${m.name}"><div class="card-body"><strong>${m.name}</strong><p>${m.category}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
-  mastersContainer.appendChild(card);
-});
-
-// Render branches
-const branchesContainer = document.getElementById("branches-cards");
-branches.forEach(b=>{
-  const card = document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<img src="${b.img}" alt="${b.name}"><div class="card-body"><strong>${b.name}</strong><p>${b.address}</p><p>Метро: ${b.metro}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
-  branchesContainer.appendChild(card);
-});
-
-// Modal logic
-const modal=document.getElementById("modal");
-const modalService=document.getElementById("modal-service");
-const modalBranch=document.getElementById("modal-branch");
-const modalMaster=document.getElementById("modal-master");
-function populateModal(){
-  modalService.innerHTML=""; services.forEach(s=>{const o=document.createElement("option"); o.value=s.name; o.text=s.name; modalService.appendChild(o);})
-  modalBranch.innerHTML=""; branches.forEach(b=>{const o=document.createElement("option"); o.value=b.name; o.text=b.name; modalBranch.appendChild(o);})
-  modalMaster.innerHTML=""; masters.forEach(m=>{const o=document.createElement("option"); o.value=m.name; o.text=m.name; modalMaster.appendChild(o);})
-}
-function openModal(serviceName="") { populateModal(); if(serviceName) modalService.value=serviceName; modal.style.display="flex"; }
-function closeModal() { modal.style.display="none"; }
-function confirmBooking() { alert(`Ваша запись подтверждена!\nУслуга: ${modalService.value}\nФилиал: ${modalBranch.value}\nМастер: ${modalMaster.value}`); closeModal(); }
-
-// Breadcrumb update
-const crumbs=document.querySelectorAll(".menu a");
-const crumbCurrent=document.getElementById("crumb-current");
-crumbs.forEach(c=>{c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}}));
 /* ===========================
    Категории услуг
 =========================== */
@@ -329,6 +263,75 @@ const BRANCHES = [
     mapQuery: "ул. Северная, 16"
   }
 ];
+</script>
+
+<script>
+const services = [
+  {name:"Маникюр", items:[...Array(10).keys()].map(i=>({name:`Маникюр ${i+1}`, price:800+i*50, img:`https://source.unsplash.com/400x300/?manicure,${i}`}))},
+  {name:"Педикюр", items:[...Array(10).keys()].map(i=>({name:`Педикюр ${i+1}`, price:1000+i*50, img:`https://source.unsplash.com/400x300/?pedicure,${i}`}))},
+  {name:"Прически", items:[...Array(12).keys()].map(i=>({name:`Прическа ${i+1}`, price:1500+i*100, img:`https://source.unsplash.com/400x300/?hairstyle,${i}`}))},
+  {name:"Макияж", items:[...Array(11).keys()].map(i=>({name:`Макияж ${i+1}`, price:1200+i*80, img:`https://source.unsplash.com/400x300/?makeup,${i}`}))},
+  {name:"Уход за красотой", items:[...Array(10).keys()].map(i=>({name:`Уход ${i+1}`, price:900+i*70, img:`https://source.unsplash.com/400x300/?spa,${i}`}))},
+];
+
+const masters = [...Array(12).keys()].map(i=>({name:`Мастер ${i+1}`, category:services[i%5].name, img:`https://source.unsplash.com/400x300/?woman,${i}`}))
+
+const branches = [
+  {name:"Центр", address:"ул. Ленина, 10", metro:"Центральная", img:"https://source.unsplash.com/400x300/?salon,1"},
+  {name:"Садовая", address:"с-б Садовая, 5", metro:"Садовая", img:"https://source.unsplash.com/400x300/?salon,2"},
+  {name:"Победа", address:"пр. Победы, 24", metro:"Победа", img:"https://source.unsplash.com/400x300/?salon,3"},
+  {name:"Невский", address:"наб. Невы, 3", metro:"Невский", img:"https://source.unsplash.com/400x300/?salon,4"},
+  {name:"Северный", address:"ул. Северная, 16", metro:"Северная", img:"https://source.unsplash.com/400x300/?salon,5"},
+];
+
+// Render services
+const servicesContainer = document.getElementById("services-cards");
+services.forEach(cat=>{
+  cat.items.forEach(s=>{
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<img src="${s.img}" alt="${s.name}"><div class="card-body"><strong>${s.name}</strong><p>${s.price} ₽</p><button class="btn" onclick="openModal('${s.name}')">Записаться</button></div>`;
+    servicesContainer.appendChild(card);
+  });
+});
+
+// Render masters
+const mastersContainer = document.getElementById("masters-cards");
+masters.forEach(m=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<img src="${m.img}" alt="${m.name}"><div class="card-body"><strong>${m.name}</strong><p>${m.category}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+  mastersContainer.appendChild(card);
+});
+
+// Render branches
+const branchesContainer = document.getElementById("branches-cards");
+branches.forEach(b=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<img src="${b.img}" alt="${b.name}"><div class="card-body"><strong>${b.name}</strong><p>${b.address}</p><p>Метро: ${b.metro}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+  branchesContainer.appendChild(card);
+});
+
+// Modal logic
+const modal=document.getElementById("modal");
+const modalService=document.getElementById("modal-service");
+const modalBranch=document.getElementById("modal-branch");
+const modalMaster=document.getElementById("modal-master");
+function populateModal(){
+  modalService.innerHTML=""; services.forEach(s=>{const o=document.createElement("option"); o.value=s.name; o.text=s.name; modalService.appendChild(o);})
+  modalBranch.innerHTML=""; branches.forEach(b=>{const o=document.createElement("option"); o.value=b.name; o.text=b.name; modalBranch.appendChild(o);})
+  modalMaster.innerHTML=""; masters.forEach(m=>{const o=document.createElement("option"); o.value=m.name; o.text=m.name; modalMaster.appendChild(o);})
+}
+function openModal(serviceName="") { populateModal(); if(serviceName) modalService.value=serviceName; modal.style.display="flex"; }
+function closeModal() { modal.style.display="none"; }
+function confirmBooking() { alert(`Ваша запись подтверждена!\nУслуга: ${modalService.value}\nФилиал: ${modalBranch.value}\nМастер: ${modalMaster.value}`); closeModal(); }
+
+// Breadcrumb update
+const crumbs=document.querySelectorAll(".menu a");
+const crumbCurrent=document.getElementById("crumb-current");
+crumbs.forEach(c=>{c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}}));
+
 </script>
 
 </body>
