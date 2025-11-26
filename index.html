@@ -4,66 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Салон красоты Наталья</title>
-
-  <!-- React CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #faf7f5;
-      color: #333;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 40px;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .menu a {
-      margin-right: 20px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-    }
-    .btn {
-      padding: 10px 18px;
-      background: #b77aa5;
-      color: white;
-      border-radius: 6px;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .hero {
-      text-align: center;
-      padding: 140px 20px;
-      background: url('https://i.imgur.com/qQ7sQ6O.jpeg') center/cover no-repeat;
-      color: white;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-    .hero h1 { font-size: 60px; margin-bottom: 10px; }
-    .hero p { font-size: 24px; }
-    #root { padding: 40px; }
+    body { margin:0; font-family: Arial, sans-serif; background: #faf7f5; color:#333; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; background:white; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:sticky; top:0; z-index:10; }
+    .menu a { margin-right:20px; text-decoration:none; color:#333; font-weight:500; }
+    .btn { padding:10px 18px; background:#b77aa5; color:white; border-radius:6px; cursor:pointer; border:none; }
+    .hero { text-align:center; padding:140px 20px; background:url('https://images.unsplash.com/photo-1612215581363-1b7db6f21230?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDF8fGJlYXV0eSUyMGNhcmV8ZW58MHx8fHwxNjUyMjUyNzY2&ixlib=rb-4.0.3&q=80&w=1080') center/cover no-repeat; color:white; text-shadow:0 2px 10px rgba(0,0,0,0.5); }
+    .hero h1 { font-size:60px; margin-bottom:10px; }
+    .hero p { font-size:24px; }
+    #root { padding:40px; max-width:1200px; margin:0 auto; }
+    .section-title { font-size:28px; margin-bottom:20px; font-weight:bold; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+    .card img { width:100%; height:180px; object-fit:cover; }
+    .card-content { padding:15px; }
+    .card-content h4 { margin:0 0 8px; }
+    .card-content p { font-size:14px; color:#555; margin:0 0 10px; }
+    .card-content .price { font-weight:bold; }
+    .card-content .card-btn { margin-top:10px; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; background:#b77aa5; color:white; }
+
+    /* Modal */
+    #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+    #modal .modal-content { background:white; padding:20px; width:380px; border-radius:10px; max-height:90vh; overflow:auto; }
+    #modal label { display:block; margin-top:10px; font-weight:500; }
+    #modal input, #modal select { width:100%; padding:6px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
+    #modal .modal-btn { margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background:#b77aa5; color:white; }
   </style>
 </head>
 <body>
-
 <header>
   <div class="logo">Салон "Наталья"</div>
   <nav class="menu">
     <a href="#services">Услуги</a>
     <a href="#masters">Мастера</a>
-    <a href="#locations">Филиалы</a>
+    <a href="#branches">Филиалы</a>
   </nav>
-  <div class="btn" onclick="openModal()">Записаться</div>
+  <button class="btn" onclick="openModal()">Записаться</button>
 </header>
 
 <section class="hero">
@@ -74,529 +50,101 @@
 <div id="root"></div>
 
 <!-- Modal -->
-<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-  <div style="background:white; padding:20px; width:380px; border-radius:10px;">
+<div id="modal">
+  <div class="modal-content">
     <h3>Запись на услугу</h3>
     <label>Услуга:</label>
-    <input style="width:100%; margin-bottom:10px;" />
+    <select id="modal-service"></select>
     <label>Филиал:</label>
-    <input style="width:100%; margin-bottom:10px;" />
+    <select id="modal-branch"></select>
     <label>Мастер:</label>
-    <input style="width:100%; margin-bottom:10px;" />
+    <select id="modal-master"></select>
     <label>Дата и время:</label>
-    <input type="datetime-local" style="width:100%; margin-bottom:10px;" />
+    <input type="datetime-local" id="modal-datetime" />
     <label>Контактные данные:</label>
-    <input style="width:100%; margin-bottom:20px;" placeholder="Телефон или почта" />
-
-    <button class="btn" style="width:100%; margin-bottom:10px;" onclick="confirmBooking()">Записаться</button>
-    <button onclick="closeModal()" style="width:100%; padding:10px;">Закрыть</button>
+    <input type="text" id="modal-contact" placeholder="Имя, телефон или email" />
+    <button class="modal-btn" onclick="confirmBooking()">Записаться</button>
+    <button class="modal-btn" style="background:#ccc;color:#000;margin-top:5px;" onclick="closeModal()">Закрыть</button>
   </div>
 </div>
 
 <script>
-  function openModal() {
-    document.getElementById('modal').style.display = 'flex';
-  }
-  function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-  }
-  function confirmBooking() {
-    alert('Ваша запись подтверждена!');
-    closeModal();
-  }
-</script>
-
-<script type="text/babel">
-  function App() {
-    return (
-      <div>
-        <h2 id="services">Услуги</h2>
-        <p>Тут будут категории услуг</p>
-      </div>
-    );
-  }
-
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-  root.render(<App />);
-</script>
-
-<!-- React App File -->
-<script type="text/babel" src="NataliaSalon.js"></script>
-  <script type="text/babel">
-  import React, { useState, useMemo } from "react";
-
-// Single-file React component for "Наталья" beauty salon landing
-// Uses Tailwind CSS classes. Default export at bottom.
-
-const CATEGORIES = [
-  {
-    id: "manicure",
-    title: "Маникюр",
-    services: Array.from({ length: 10 }).map((_, i) => ({
-      id: `man-${i + 1}`,
-      name: `Классический маникюр ${i + 1}`,
-      description:
-        "Аккуратная обработка кутикулы, пилочка, нанесение лака. Идеально подходит для повседневного образа.",
-      price: 800 + i * 50,
-      img: null,
-    })),
-  },
-  {
-    id: "pedicure",
-    title: "Педикюр",
-    services: Array.from({ length: 10 }).map((_, i) => ({
-      id: `ped-${i + 1}`,
-      name: `Европейский педикюр ${i + 1}`,
-      description:
-        "Комфортная процедура с расслабляющей ванночкой и покрытием. Подходит для чувствительных ног.",
-      price: 1200 + i * 60,
-      img: null,
-    })),
-  },
-  {
-    id: "hair",
-    title: "Прически",
-    services: Array.from({ length: 12 }).map((_, i) => ({
-      id: `hair-${i + 1}`,
-      name: `Сложная прическа ${i + 1}`,
-      description:
-        "Авторская прическа для мероприятий: фиксация, украшения по желанию клиента.",
-      price: 1800 + i * 150,
-      img: null,
-    })),
-  },
-  {
-    id: "makeup",
-    title: "Макияж",
-    services: Array.from({ length: 11 }).map((_, i) => ({
-      id: `make-${i + 1}`,
-      name: `Вечерний макияж ${i + 1}`,
-      description:
-        "Профессиональный макияж с учётом цветотипа и особенностей лица, стойкие материалы.",
-      price: 1500 + i * 120,
-      img: null,
-    })),
-  },
-  {
-    id: "care",
-    title: "Уход за красотой",
-    services: Array.from({ length: 10 }).map((_, i) => ({
-      id: `care-${i + 1}`,
-      name: `Уходовая процедура ${i + 1}`,
-      description:
-        "Комплексный уход за кожей/тельцом с использованием профессиональных средств.",
-      price: 1000 + i * 100,
-      img: null,
-    })),
-  },
+// Данные
+const SERVICES = [
+  {name:'Маникюр', items:[
+    {name:'Классический маникюр', desc:'Аккуратная обработка кутикулы и покрытие лаком', price:800,img:'https://images.unsplash.com/photo-1600180758890-31a2e1fa3a20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'},
+    {name:'Французский маникюр', desc:'Элегантный френч с глянцевым покрытием', price:1000,img:'https://images.unsplash.com/photo-1596484575763-7a897ff88d22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
+  {name:'Педикюр', items:[
+    {name:'Европейский педикюр', desc:'Расслабляющая ванночка и покрытие', price:1200,img:'https://images.unsplash.com/photo-1590031905476-d0c0b63f71b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
+  {name:'Прически', items:[
+    {name:'Свадебная прическа', desc:'Элегантная укладка для особого события', price:2500,img:'https://images.unsplash.com/photo-1607746882042-944635dfe10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
+  {name:'Макияж', items:[
+    {name:'Вечерний макияж', desc:'Стойкий макияж с учётом особенностей лица', price:1500,img:'https://images.unsplash.com/photo-1590080878836-768a69f215e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]},
+  {name:'Уход за красотой', items:[
+    {name:'Массаж лица', desc:'Расслабляющий уход за кожей', price:1000,img:'https://images.unsplash.com/photo-1598899134739-f9c23801ec4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'}]}
 ];
 
-const MASTERS = Array.from({ length: 12 }).map((_, i) => ({
-  id: `m-${i + 1}`,
-  name: ["Анастасия", "Екатерина", "Мария", "Ольга", "Ирина", "Наталья", "Светлана", "Олеся", "Татьяна", "Виктория", "Людмила", "Ксения"][i % 12] + ` ${i + 1}`,
-  experience: `${2 + (i % 15)} лет`, // sample
-  categories: (() => {
-    if (i % 5 === 0) return ["Маникюр"];
-    if (i % 5 === 1) return ["Педикюр"];
-    if (i % 5 === 2) return ["Прически"];
-    if (i % 5 === 3) return ["Макияж"];
-    return ["Уход за красотой"];
-  })(),
-  img: null,
-}));
+const MASTERS = [
+  {name:'Анастасия', category:'Маникюр', exp:'5 лет'},
+  {name:'Екатерина', category:'Педикюр', exp:'7 лет'},
+  {name:'Мария', category:'Прически', exp:'10 лет'}
+];
 
 const BRANCHES = [
-  {
-    id: "b1",
-    name: "Наталья — Центр",
-    address: "ул. Ленина, 10",
-    metro: ["Центральная"],
-    photos: [],
-    mapQuery: "ул. Ленина, 10",
-  },
-  {
-    id: "b2",
-    name: "Наталья — Садовая",
-    address: "с-б Садовая, 5",
-    metro: ["Садовая"],
-    photos: [],
-    mapQuery: "Садовая, 5",
-  },
-  {
-    id: "b3",
-    name: "Наталья — Победа",
-    address: "пр. Победы, 24",
-    metro: ["Победа"],
-    photos: [],
-    mapQuery: "пр. Победы, 24",
-  },
-  {
-    id: "b4",
-    name: "Наталья — Невский",
-    address: "наб. Невы, 3",
-    metro: ["Невский"],
-    photos: [],
-    mapQuery: "наб. Невы, 3",
-  },
-  {
-    id: "b5",
-    name: "Наталья — Северный",
-    address: "ул. Северная, 16",
-    metro: ["Северная"],
-    photos: [],
-    mapQuery: "ул. Северная, 16",
-  },
+  {name:'Наталья — Центр', addr:'ул. Ленина, 10'},
+  {name:'Наталья — Садовая', addr:'с-б Садовая, 5'}
 ];
 
-// Utils
-const formatPrice = (p) => `${p} ₽`;
-
-function BookingModal({ open, onClose, servicesData, masters, branches }) {
-  const [lines, setLines] = useState([
-    { id: cryptoSafeId(), categoryId: servicesData[0].id, serviceId: servicesData[0].services[0].id, branchId: branches[0].id, masterId: masters[0].id },
-  ]);
-  const [clientName, setClientName] = useState("");
-  const [contact, setContact] = useState("");
-  const [dateTime, setDateTime] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
-
-  const addLine = () => {
-    setLines((s) => [...s, { id: cryptoSafeId(), categoryId: servicesData[0].id, serviceId: servicesData[0].services[0].id, branchId: branches[0].id, masterId: masters[0].id }]);
-  };
-
-  const updateLine = (id, patch) => {
-    setLines((s) => s.map((l) => (l.id === id ? { ...l, ...patch } : l)));
-  };
-
-  const removeLine = (id) => {
-    setLines((s) => s.filter((l) => l.id !== id));
-  };
-
-  const total = useMemo(() => {
-    return lines.reduce((sum, l) => {
-      const cat = servicesData.find((c) => c.id === l.categoryId);
-      if (!cat) return sum;
-      const svc = cat.services.find((x) => x.id === l.serviceId);
-      if (!svc) return sum;
-      return sum + svc.price;
-    }, 0);
-  }, [lines, servicesData]);
-
-  const handleSubmit = () => {
-    // Here would be API call. We'll just simulate confirmation.
-    setConfirmed(true);
-  };
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-auto max-h-[90dvh]">
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Запись на услугу</h3>
-            <button onClick={onClose} className="text-gray-500">Закрыть ✕</button>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            {lines.map((line, idx) => {
-              const category = servicesData.find((c) => c.id === line.categoryId);
-              const services = category ? category.services : servicesData[0].services;
-              const service = services.find((s) => s.id === line.serviceId) || services[0];
-
-              return (
-                <div key={line.id} className="border rounded-lg p-3">
-                  <div className="flex justify-between items-start gap-3">
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium">Категория</label>
-                      <select value={line.categoryId} onChange={(e) => updateLine(line.id, { categoryId: e.target.value, serviceId: servicesData.find(c=>c.id===e.target.value).services[0].id })} className="mt-1 block w-full rounded-md border p-2">
-                        {servicesData.map((c) => (
-                          <option key={c.id} value={c.id}>{c.title}</option>
-                        ))}
-                      </select>
-
-                      <label className="block text-sm font-medium mt-3">Услуга</label>
-                      <select value={line.serviceId} onChange={(e) => updateLine(line.id, { serviceId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
-                        {services.map((s) => (
-                          <option key={s.id} value={s.id}>{s.name} — {formatPrice(s.price)}</option>
-                        ))}
-                      </select>
-
-                      <label className="block text-sm font-medium mt-3">Филиал</label>
-                      <select value={line.branchId} onChange={(e) => updateLine(line.id, { branchId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
-                        {branches.map((b) => <option key={b.id} value={b.id}>{b.name} — {b.address}</option>)}
-                      </select>
-
-                      <label className="block text-sm font-medium mt-3">Мастер</label>
-                      <select value={line.masterId} onChange={(e) => updateLine(line.id, { masterId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
-                        {masters.map((m) => (
-                          <option key={m.id} value={m.id}>{m.name} — {m.categories.join(", ")}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="w-40 text-right">
-                      <div className="text-sm text-gray-500">Цена</div>
-                      <div className="text-lg font-semibold mt-2">{formatPrice(service.price)}</div>
-
-                      <button onClick={() => removeLine(line.id)} className="mt-4 text-sm text-red-600">Удалить</button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            <div>
-              <button onClick={addLine} className="inline-flex items-center gap-2 px-3 py-2 rounded-md border">
-                <span className="text-xl">＋</span> Добавить услугу
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium">Дата и время</label>
-                <input type="datetime-local" value={dateTime} onChange={(e) => setDateTime(e.target.value)} className="mt-1 block w-full rounded-md border p-2" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Контактные данные</label>
-                <input placeholder="Имя" value={clientName} onChange={(e) => setClientName(e.target.value)} className="mt-1 block w-full rounded-md border p-2" />
-                <input placeholder="Телефон или email" value={contact} onChange={(e) => setContact(e.target.value)} className="mt-2 block w-full rounded-md border p-2" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div>
-                <div className="text-sm text-gray-500">Итого</div>
-                <div className="text-2xl font-bold">{formatPrice(total)}</div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button onClick={onClose} className="px-4 py-2 rounded-md border">Отмена</button>
-                <button onClick={handleSubmit} className="px-4 py-2 rounded-md bg-black text-white">Записаться</button>
-              </div>
-            </div>
-
-            {confirmed && (
-              <div className="mt-4 p-3 rounded-md bg-green-50 border border-green-200">
-                <div className="font-semibold">Ваша запись подтверждена</div>
-                <div className="text-sm text-gray-700">Мы отправим подтверждение на указанные контакты. Спасибо!</div>
-              </div>
-            )}
-
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+// Функции модалки
+function openModal(){ document.getElementById('modal').style.display='flex'; populateModal(); }
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+function confirmBooking(){ alert('Запись подтверждена!'); closeModal(); }
+function populateModal(){
+  const serviceSel = document.getElementById('modal-service');
+  const branchSel = document.getElementById('modal-branch');
+  const masterSel = document.getElementById('modal-master');
+  serviceSel.innerHTML=''; branchSel.innerHTML=''; masterSel.innerHTML='';
+  SERVICES.forEach(s=>s.items.forEach(i=>{ let opt=document.createElement('option'); opt.value=i.name; opt.text=`${i.name} — ${i.price} ₽`; serviceSel.add(opt); }));
+  BRANCHES.forEach(b=>{ let opt=document.createElement('option'); opt.value=b.name; opt.text=b.name; branchSel.add(opt); });
+  MASTERS.forEach(m=>{ let opt=document.createElement('option'); opt.value=m.name; opt.text=`${m.name} — ${m.category}`; masterSel.add(opt); });
 }
 
-function cryptoSafeId() {
-  // Simple id generator that does not rely on window.crypto in all environments
-  return `id-${Math.random().toString(36).slice(2, 9)}`;
-}
+// Генерация контента
+const root=document.getElementById('root');
 
-export default function SalonNatalya() {
-  const [bookingOpen, setBookingOpen] = useState(false);
+// Услуги
+const servSec=document.createElement('section');
+servSec.id='services';
+servSec.innerHTML='<h2 class="section-title">Категории услуг</h2>';
+const servCards=document.createElement('div'); servCards.className='cards';
+SERVICES.forEach(cat=>cat.items.forEach(i=>{
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<img src="${i.img}" alt="${i.name}"><div class="card-content"><h4>${i.name}</h4><p>${i.desc}</p><div class="price">${i.price} ₽</div><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
+  servCards.appendChild(card);
+}));
+servSec.appendChild(servCards); root.appendChild(servSec);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="container mx-auto flex items-center justify-between p-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center font-bold">N</div>
-            <div>
-              <div className="font-semibold">Наталья</div>
-              <div className="text-xs text-gray-500">Салон красоты</div>
-            </div>
-          </div>
+// Мастера
+const mastSec=document.createElement('section');
+mastSec.id='masters'; mastSec.innerHTML='<h2 class="section-title">Наши мастера</h2>';
+const mastCards=document.createElement('div'); mastCards.className='cards';
+MASTERS.forEach(m=>{
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" alt="${m.name}"><div class="card-content"><h4>${m.name}</h4><p>Специализация: ${m.category}</p><p>Стаж: ${m.exp}</p><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
+  mastCards.appendChild(card);
+});
+mastSec.appendChild(mastCards); root.appendChild(mastSec);
 
-          <nav className="hidden md:flex gap-6 items-center">
-            <a className="hover:underline" href="#services">Услуги</a>
-            <a className="hover:underline" href="#masters">Мастера</a>
-            <a className="hover:underline" href="#branches">Филиалы</a>
-            <a className="hover:underline" href="#contacts">Контакты</a>
-            <a className="hover:underline" href="#blog">Блог</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button onClick={() => setBookingOpen(true)} className="px-4 py-2 rounded-md bg-pink-600 text-white">Записаться</button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center gap-8">
-        <div className="flex-1">
-          <div className="text-sm uppercase text-pink-600 font-medium">Салон красоты</div>
-          <h1 className="text-4xl md:text-5xl font-bold mt-2">Наталья — ваша красота в заботливых руках</h1>
-          <p className="mt-4 text-gray-700 max-w-xl">Мы верим, что красота — это индивидуальность и небольшие ритуалы, которые делают каждый день лучше. Профессиональные мастера, приятная атмосфера и высокое качество сервисов.</p>
-
-          <div className="mt-6 flex gap-3">
-            <button onClick={() => setBookingOpen(true)} className="px-5 py-3 rounded-md bg-black text-white">Записаться</button>
-            <a href="#services" className="px-5 py-3 rounded-md border">Услуги</a>
-          </div>
-        </div>
-
-        <div className="w-full md:w-1/3 bg-pink-50 rounded-2xl p-6 flex items-center justify-center">
-          {/* logo / visual placeholder */}
-          <div className="text-center">
-            <div className="w-36 h-36 rounded-full bg-white shadow-md mx-auto flex items-center justify-center text-3xl font-bold">N</div>
-            <div className="mt-3 text-sm text-gray-600">Логотип, слоган и визуальная концепция из брендбука</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services */}
-      <section id="services" className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold">Категории услуг</h2>
-        <p className="text-gray-600 mt-2">Выберите категорию и ознакомьтесь с примерами услуг. В каждой карточке — краткое описание, фото-пример, цена и кнопка записи.</p>
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {CATEGORIES.map((cat) => (
-            <div key={cat.id} className="bg-white rounded-2xl p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{cat.title}</h3>
-                  <div className="text-sm text-gray-500">Примерный перечень услуг</div>
-                </div>
-                <div className="text-sm text-gray-600">{cat.services.length} услуг</div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {cat.services.map((s) => (
-                  <div key={s.id} className="border rounded-lg overflow-hidden flex">
-                    <div className="w-28 h-28 bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400">Фото</div>
-                    <div className="p-3 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="font-medium">{s.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{s.description}</div>
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="font-semibold">{formatPrice(s.price)}</div>
-                        <button onClick={() => setBookingOpen(true)} className="text-sm px-3 py-1 rounded-md border">Записаться</button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Masters */}
-      <section id="masters" className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold">Наши мастера</h2>
-        <p className="text-gray-600 mt-2">Профессиональная команда: ФИО, стаж и специализация.</p>
-
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MASTERS.map((m) => (
-            <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-3">
-              <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">Фото</div>
-              <div className="font-semibold">{m.name}</div>
-              <div className="text-sm text-gray-600">Стаж: {m.experience}</div>
-              <div className="text-sm text-gray-600">Специализация: {m.categories.join(", ")}</div>
-              <div className="mt-3">
-                <button onClick={() => setBookingOpen(true)} className="w-full px-4 py-2 rounded-md border">Записаться к мастеру</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Branches */}
-      <section id="branches" className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold">Филиалы</h2>
-        <p className="text-gray-600 mt-2">Пять филиалов салона "Наталья" с адресами, фотографиями и метками метро.</p>
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {BRANCHES.map((b) => (
-            <div key={b.id} className="bg-white rounded-2xl p-4 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="w-36 h-24 bg-gray-100 flex-shrink-0 rounded-md flex items-center justify-center text-gray-400">Фото</div>
-                <div>
-                  <div className="font-semibold">{b.name}</div>
-                  <div className="text-sm text-gray-600">{b.address}</div>
-                  <div className="text-sm text-gray-600 mt-1">Ближайшие станции метро: {b.metro.join(", ")}</div>
-                  <div className="mt-3 flex gap-2">
-                    <a className="text-sm underline" href={`https://maps.google.com?q=${encodeURIComponent(b.mapQuery)}`} target="_blank" rel="noreferrer">Посмотреть на карте</a>
-                    <button onClick={() => setBookingOpen(true)} className="text-sm px-3 py-1 rounded-md border">Записаться</button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="w-full h-24 bg-gray-50 rounded-md flex items-center justify-center text-gray-400">Интерьер</div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer id="contacts" className="bg-black text-white py-10 mt-12">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center font-bold">N</div>
-              <div>
-                <div className="font-semibold">Наталья</div>
-                <div className="text-sm">Салон красоты</div>
-              </div>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-300">© {new Date().getFullYear()} Наталья. Все права защищены.</div>
-          </div>
-
-          <div>
-            <div className="font-semibold">Соцсети и мессенджеры</div>
-            <ul className="mt-3 text-sm text-gray-300 space-y-2">
-              <li>Instagram</li>
-              <li>VK</li>
-              <li>WhatsApp</li>
-              <li>Telegram</li>
-              <li>Viber</li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="font-semibold">Полезно покупателям</div>
-            <ul className="mt-3 text-sm text-gray-300 space-y-2">
-              <li>Акции и скидки</li>
-              <li>Бонусная программа</li>
-              <li>Подарочные сертификаты</li>
-              <li>Блог</li>
-              <li>Вопрос-ответ</li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="font-semibold">Партнёрам</div>
-            <ul className="mt-3 text-sm text-gray-300 space-y-2">
-              <li>Франчайзинг</li>
-              <li>Поставщики</li>
-              <li>Корпоративным клиентам</li>
-              <li>Сотрудничество</li>
-              <li>Контакты</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-4 mt-6 text-xs text-gray-400">Соглашение с политикой конфиденциальности и обработкой персональных данных. Соглашение на сбор файлов cookie.</div>
-      </footer>
-
-      {/* Booking modal component (mounted once) */}
-      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} servicesData={CATEGORIES} masters={MASTERS} branches={BRANCHES} />
-    </div>
-  );
-}
-
+// Филиалы
+const branchSec=document.createElement('section');
+branchSec.id='branches'; branchSec.innerHTML='<h2 class="section-title">Филиалы</h2>';
+const branchCards=document.createElement('div'); branchCards.className='cards';
+BRANCHES.forEach(b=>{
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<img src="https://images.unsplash.com/photo-1618210640610-dff01c9f3911?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" alt="${b.name}"><div class="card-content"><h4>${b.name}</h4><p>${b.addr}</p><button class="card-btn" onclick="openModal()">Записаться</button></div>`;
+  branchCards.appendChild(card);
+});
+branchSec.appendChild(branchCards); root.appendChild(branchSec);
 </script>
-
 </body>
 </html>
