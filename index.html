@@ -25,6 +25,7 @@
     footer ul li { margin-bottom:6px; }
     .breadcrumbs { font-size:14px; margin-bottom:20px; color:#555; }
     .breadcrumbs a { color:#b77aa5; }
+    .breadcrumbs span { margin:0 5px; }
     /* Modal */
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
     .modal-content { background:white; padding:20px; width:400px; border-radius:10px; max-height:90vh; overflow:auto; }
@@ -32,7 +33,6 @@
     .modal-content input, .modal-content select { width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
     .modal-content button { margin-top:10px; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; }
     .modal-content .close { background:#ccc; color:#000; margin-top:5px; }
-    .breadcrumbs span { margin:0 5px; }
   </style>
 </head>
 <body>
@@ -109,8 +109,8 @@
 </footer>
 
 <!-- Modal -->
-<div class="modal" id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-  <div class="modal-content" style="background:white; padding:20px; width:380px; border-radius:10px;">
+<div class="modal" id="modal">
+  <div class="modal-content">
     <h3>Запись на услугу</h3>
 
     <label>Услуга:</label>
@@ -134,279 +134,87 @@
 </div>
 
 <script>
-/* Открытие и закрытие модалки */
-function openModal() {
-  document.getElementById('modal').style.display = 'flex';
-}
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
+/* ===========================
+   Данные
+=========================== */
+const CATEGORIES = [
+  { title: "Маникюр", services: [{name:"Классический", price:800, img:"https://source.unsplash.com/200x200/?manicure,1"}] },
+  { title: "Педикюр", services: [{name:"Классический", price:1000, img:"https://source.unsplash.com/200x200/?pedicure,1"}] },
+  { title: "Прически", services: [{name:"Повседневная", price:1500, img:"https://source.unsplash.com/200x200/?hair,1"}] },
+  { title: "Макияж", services: [{name:"Дневной", price:1200, img:"https://source.unsplash.com/200x200/?makeup,1"}] },
+  { title: "Уход за красотой", services: [{name:"SPA уход", price:2000, img:"https://source.unsplash.com/200x200/?spa,1"}] }
+];
 
-/* Заполнение select'ов модалки */
-function populateModal() {
-  const serviceSelect = document.getElementById('modal-service');
-  const branchSelect = document.getElementById('modal-branch');
-  const masterSelect = document.getElementById('modal-master');
+const MASTERS = [
+  { name: "Анастасия Смирнова", categories:["Маникюр"], experience:"5 лет", img:"https://source.unsplash.com/100x100/?woman,1" },
+  { name: "Екатерина Иванова", categories:["Педикюр"], experience:"6 лет", img:"https://source.unsplash.com/100x100/?woman,2" }
+];
 
-  // Услуги
-  serviceSelect.innerHTML = '';
+const BRANCHES = [
+  { name:"Центр", address:"ул. Ленина, 10", metro:"Центральная", img:"https://source.unsplash.com/200x150/?salon,1" },
+  { name:"Садовая", address:"с-б Садовая, 5", metro:"Садовая", img:"https://source.unsplash.com/200x150/?salon,2" }
+];
+
+/* ===========================
+   Рендер карточек
+=========================== */
+function renderCards() {
+  const servicesContainer = document.getElementById("services-cards");
   CATEGORIES.forEach(cat => {
     cat.services.forEach(svc => {
-      const opt = document.createElement('option');
-      opt.value = `${cat.title} — ${svc.name} — ${svc.price}₽`;
-      opt.textContent = `${cat.title} — ${svc.name} — ${svc.price}₽`;
-      serviceSelect.appendChild(opt);
+      const card = document.createElement("div");
+      card.className="card";
+      card.innerHTML=`<img src="${svc.img}" alt="${svc.name}"><div class="card-body"><strong>${svc.name}</strong><p>${svc.price} ₽</p><button class="btn" onclick="openModal('${svc.name}')">Записаться</button></div>`;
+      servicesContainer.appendChild(card);
     });
   });
 
-  // Филиалы
-  branchSelect.innerHTML = '';
-  BRANCHES.forEach(branch => {
-    const opt = document.createElement('option');
-    opt.value = branch.name;
-    opt.textContent = branch.name + ' — ' + branch.address;
-    branchSelect.appendChild(opt);
-  });
-
-  // Мастера
-  masterSelect.innerHTML = '';
-  MASTERS.forEach(master => {
-    const opt = document.createElement('option');
-    opt.value = master.name;
-    opt.textContent = master.name + ' — ' + master.categories.join(", ");
-    masterSelect.appendChild(opt);
-  });
-}
-
-/* Подтверждение записи */
-function confirmBooking() {
-  const service = document.getElementById('modal-service').value;
-  const branch = document.getElementById('modal-branch').value;
-  const master = document.getElementById('modal-master').value;
-  const datetime = document.getElementById('modal-datetime').value;
-  const contact = document.getElementById('modal-contact').value;
-
-  if (!service || !branch || !master || !datetime || !contact) {
-    alert('Пожалуйста, заполните все поля.');
-    return;
-  }
-
-  alert(`Запись подтверждена!\nУслуга: ${service}\nФилиал: ${branch}\nМастер: ${master}\nДата: ${datetime}\nКонтакты: ${contact}`);
-  closeModal();
-}
-
-/* Заполняем select при открытии модалки */
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target.id === 'modal') populateModal();
-});
-</script>
-
-<script>
-/* ===========================
-   Категории услуг
-=========================== */
-const CATEGORIES = [
-  {
-    id: "manicure",
-    title: "Маникюр",
-    services: [
-      { name: "Классический маникюр", description: "Обработка кутикулы, пилочка, лак.", price: 800, img: "https://source.unsplash.com/200x200/?manicure,1" },
-      { name: "Аппаратный маникюр", description: "Аккуратная обработка с помощью аппарата.", price: 1000, img: "https://source.unsplash.com/200x200/?manicure,2" },
-      { name: "Французский маникюр", description: "Нежный френч, стойкий результат.", price: 1200, img: "https://source.unsplash.com/200x200/?manicure,3" },
-      { name: "Дизайн ногтей", description: "Рисунки, стразы, камифубуки.", price: 1500, img: "https://source.unsplash.com/200x200/?manicure,4" },
-      { name: "Укрепление ногтей", description: "Гель или биогель для прочности.", price: 1400, img: "https://source.unsplash.com/200x200/?manicure,5" }
-    ]
-  },
-  {
-    id: "pedicure",
-    title: "Педикюр",
-    services: [
-      { name: "Классический педикюр", description: "Ванночка, обработка ногтей.", price: 1000, img: "https://source.unsplash.com/200x200/?pedicure,1" },
-      { name: "Европейский педикюр", description: "Мягкая обработка, покрытие.", price: 1200, img: "https://source.unsplash.com/200x200/?pedicure,2" },
-      { name: "Аппаратный педикюр", description: "Удаление мозолей безопасно.", price: 1300, img: "https://source.unsplash.com/200x200/?pedicure,3" },
-      { name: "SPA педикюр", description: "Скраб, маска, массаж.", price: 1500, img: "https://source.unsplash.com/200x200/?pedicure,4" }
-    ]
-  },
-  {
-    id: "hair",
-    title: "Прически",
-    services: [
-      { name: "Повседневная прическа", description: "Для работы или прогулки.", price: 1500, img: "https://source.unsplash.com/200x200/?hair,1" },
-      { name: "Вечерняя прическа", description: "Для торжественных событий.", price: 2000, img: "https://source.unsplash.com/200x200/?hair,2" },
-      { name: "Свадебная прическа", description: "С укладкой и украшениями.", price: 3500, img: "https://source.unsplash.com/200x200/?hair,3" },
-      { name: "Плетения и косы", description: "Сложные варианты и плетения.", price: 1800, img: "https://source.unsplash.com/200x200/?hair,4" }
-    ]
-  },
-  {
-    id: "makeup",
-    title: "Макияж",
-    services: [
-      { name: "Дневной макияж", description: "Естественный и свежий.", price: 1200, img: "https://source.unsplash.com/200x200/?makeup,1" },
-      { name: "Вечерний макияж", description: "Яркие акценты, стойкий результат.", price: 1500, img: "https://source.unsplash.com/200x200/?makeup,2" },
-      { name: "Свадебный макияж", description: "Фотогеничный и стойкий.", price: 2500, img: "https://source.unsplash.com/200x200/?makeup,3" },
-      { name: "Коррекция бровей и ресниц", description: "Коррекция и окрашивание.", price: 800, img: "https://source.unsplash.com/200x200/?makeup,4" }
-    ]
-  },
-  {
-    id: "care",
-    title: "Уход за красотой",
-    services: [
-      { name: "Уход за кожей лица", description: "Очищение, маска, массаж.", price: 1000, img: "https://source.unsplash.com/200x200/?spa,1" },
-      { name: "Уход за телом", description: "Скраб и увлажнение кожи.", price: 1200, img: "https://source.unsplash.com/200x200/?spa,2" },
-      { name: "SPA программы", description: "Расслабляющие процедуры.", price: 2000, img: "https://source.unsplash.com/200x200/?spa,3" },
-      { name: "Массаж лица и шеи", description: "Снятие напряжения, тонизирование.", price: 800, img: "https://source.unsplash.com/200x200/?spa,4" }
-    ]
-  }
-];
-
-/* ===========================
-   Наши мастера
-=========================== */
-const MASTERS = [
-  { name: "Анастасия Смирнова", categories: ["Маникюр", "Дизайн ногтей"], experience: "5 лет", img: "https://source.unsplash.com/100x100/?woman,1" },
-  { name: "Екатерина Иванова", categories: ["Педикюр"], experience: "6 лет", img: "https://source.unsplash.com/100x100/?woman,2" },
-  { name: "Мария Кузнецова", categories: ["Прически"], experience: "8 лет", img: "https://source.unsplash.com/100x100/?woman,3" },
-  { name: "Ольга Петрова", categories: ["Макияж"], experience: "7 лет", img: "https://source.unsplash.com/100x100/?woman,4" },
-  { name: "Ирина Соколова", categories: ["SPA", "Уход за телом"], experience: "10 лет", img: "https://source.unsplash.com/100x100/?woman,5" },
-  { name: "Наталья Федорова", categories: ["Маникюр", "Педикюр"], experience: "9 лет", img: "https://source.unsplash.com/100x100/?woman,6" },
-  { name: "Светлана Васильева", categories: ["Прически", "Вечерние укладки"], experience: "6 лет", img: "https://source.unsplash.com/100x100/?woman,7" },
-  { name: "Олеся Попова", categories: ["Макияж"], experience: "4 года", img: "https://source.unsplash.com/100x100/?woman,8" },
-  { name: "Татьяна Михайлова", categories: ["SPA"], experience: "5 лет", img: "https://source.unsplash.com/100x100/?woman,9" },
-  { name: "Виктория Новикова", categories: ["Маникюр"], experience: "3 года", img: "https://source.unsplash.com/100x100/?woman,10" }
-];
-
-/* ===========================
-   Филиалы салона
-=========================== */
-const BRANCHES = [
-  {
-    name: "Наталья — Центр",
-    address: "ул. Ленина, 10",
-    metro: ["Центральная"],
-    photos: [
-      "https://source.unsplash.com/200x150/?salon,1",
-      "https://source.unsplash.com/200x150/?salon,2",
-      "https://source.unsplash.com/200x150/?salon,3",
-      "https://source.unsplash.com/200x150/?salon,4"
-    ],
-    mapQuery: "ул. Ленина, 10"
-  },
-  {
-    name: "Наталья — Садовая",
-    address: "с-б Садовая, 5",
-    metro: ["Садовая"],
-    photos: [
-      "https://source.unsplash.com/200x150/?salon,5",
-      "https://source.unsplash.com/200x150/?salon,6",
-      "https://source.unsplash.com/200x150/?salon,7",
-      "https://source.unsplash.com/200x150/?salon,8"
-    ],
-    mapQuery: "с-б Садовая, 5"
-  },
-  {
-    name: "Наталья — Победа",
-    address: "пр. Победы, 24",
-    metro: ["Победа"],
-    photos: [
-      "https://source.unsplash.com/200x150/?salon,9",
-      "https://source.unsplash.com/200x150/?salon,10",
-      "https://source.unsplash.com/200x150/?salon,11",
-      "https://source.unsplash.com/200x150/?salon,12"
-    ],
-    mapQuery: "пр. Победы, 24"
-  },
-  {
-    name: "Наталья — Невский",
-    address: "наб. Невы, 3",
-    metro: ["Невский"],
-    photos: [
-      "https://source.unsplash.com/200x150/?salon,13",
-      "https://source.unsplash.com/200x150/?salon,14",
-      "https://source.unsplash.com/200x150/?salon,15"
-    ],
-    mapQuery: "наб. Невы, 3"
-  },
-  {
-    name: "Наталья — Северный",
-    address: "ул. Северная, 16",
-    metro: ["Северная"],
-    photos: [
-      "https://source.unsplash.com/200x150/?salon,16",
-      "https://source.unsplash.com/200x150/?salon,17",
-      "https://source.unsplash.com/200x150/?salon,18"
-    ],
-    mapQuery: "ул. Северная, 16"
-  }
-];
-</script>
-
-<script>
-const services = [
-  {name:"Маникюр", items:[...Array(10).keys()].map(i=>({name:`Маникюр ${i+1}`, price:800+i*50, img:`https://source.unsplash.com/400x300/?manicure,${i}`}))},
-  {name:"Педикюр", items:[...Array(10).keys()].map(i=>({name:`Педикюр ${i+1}`, price:1000+i*50, img:`https://source.unsplash.com/400x300/?pedicure,${i}`}))},
-  {name:"Прически", items:[...Array(12).keys()].map(i=>({name:`Прическа ${i+1}`, price:1500+i*100, img:`https://source.unsplash.com/400x300/?hairstyle,${i}`}))},
-  {name:"Макияж", items:[...Array(11).keys()].map(i=>({name:`Макияж ${i+1}`, price:1200+i*80, img:`https://source.unsplash.com/400x300/?makeup,${i}`}))},
-  {name:"Уход за красотой", items:[...Array(10).keys()].map(i=>({name:`Уход ${i+1}`, price:900+i*70, img:`https://source.unsplash.com/400x300/?spa,${i}`}))},
-];
-
-const masters = [...Array(12).keys()].map(i=>({name:`Мастер ${i+1}`, category:services[i%5].name, img:`https://source.unsplash.com/400x300/?woman,${i}`}))
-
-const branches = [
-  {name:"Центр", address:"ул. Ленина, 10", metro:"Центральная", img:"https://source.unsplash.com/400x300/?salon,1"},
-  {name:"Садовая", address:"с-б Садовая, 5", metro:"Садовая", img:"https://source.unsplash.com/400x300/?salon,2"},
-  {name:"Победа", address:"пр. Победы, 24", metro:"Победа", img:"https://source.unsplash.com/400x300/?salon,3"},
-  {name:"Невский", address:"наб. Невы, 3", metro:"Невский", img:"https://source.unsplash.com/400x300/?salon,4"},
-  {name:"Северный", address:"ул. Северная, 16", metro:"Северная", img:"https://source.unsplash.com/400x300/?salon,5"},
-];
-
-// Render services
-const servicesContainer = document.getElementById("services-cards");
-services.forEach(cat=>{
-  cat.items.forEach(s=>{
+  const mastersContainer = document.getElementById("masters-cards");
+  MASTERS.forEach(m => {
     const card = document.createElement("div");
     card.className="card";
-    card.innerHTML=`<img src="${s.img}" alt="${s.name}"><div class="card-body"><strong>${s.name}</strong><p>${s.price} ₽</p><button class="btn" onclick="openModal('${s.name}')">Записаться</button></div>`;
-    servicesContainer.appendChild(card);
+    card.innerHTML=`<img src="${m.img}" alt="${m.name}"><div class="card-body"><strong>${m.name}</strong><p>${m.categories.join(", ")}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+    mastersContainer.appendChild(card);
   });
-});
 
-// Render masters
-const mastersContainer = document.getElementById("masters-cards");
-masters.forEach(m=>{
-  const card = document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<img src="${m.img}" alt="${m.name}"><div class="card-body"><strong>${m.name}</strong><p>${m.category}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
-  mastersContainer.appendChild(card);
-});
+  const branchesContainer = document.getElementById("branches-cards");
+  BRANCHES.forEach(b => {
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<img src="${b.img}" alt="${b.name}"><div class="card-body"><strong>${b.name}</strong><p>${b.address}</p><p>Метро: ${b.metro}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
+    branchesContainer.appendChild(card);
+  });
+}
 
-// Render branches
-const branchesContainer = document.getElementById("branches-cards");
-branches.forEach(b=>{
-  const card = document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<img src="${b.img}" alt="${b.name}"><div class="card-body"><strong>${b.name}</strong><p>${b.address}</p><p>Метро: ${b.metro}</p><button class="btn" onclick="openModal()">Записаться</button></div>`;
-  branchesContainer.appendChild(card);
-});
-
-// Modal logic
+/* ===========================
+   Модальное окно
+=========================== */
 const modal=document.getElementById("modal");
 const modalService=document.getElementById("modal-service");
 const modalBranch=document.getElementById("modal-branch");
 const modalMaster=document.getElementById("modal-master");
-function populateModal(){
-  modalService.innerHTML=""; services.forEach(s=>{const o=document.createElement("option"); o.value=s.name; o.text=s.name; modalService.appendChild(o);})
-  modalBranch.innerHTML=""; branches.forEach(b=>{const o=document.createElement("option"); o.value=b.name; o.text=b.name; modalBranch.appendChild(o);})
-  modalMaster.innerHTML=""; masters.forEach(m=>{const o=document.createElement("option"); o.value=m.name; o.text=m.name; modalMaster.appendChild(o);})
+
+function populateModal() {
+  modalService.innerHTML=""; CATEGORIES.forEach(cat => cat.services.forEach(svc => { let opt=document.createElement("option"); opt.value=svc.name; opt.text=svc.name; modalService.appendChild(opt); }));
+  modalBranch.innerHTML=""; BRANCHES.forEach(b => { let opt=document.createElement("option"); opt.value=b.name; opt.text=b.name; modalBranch.appendChild(opt); });
+  modalMaster.innerHTML=""; MASTERS.forEach(m => { let opt=document.createElement("option"); opt.value=m.name; opt.text=m.name; modalMaster.appendChild(opt); });
 }
+
 function openModal(serviceName="") { populateModal(); if(serviceName) modalService.value=serviceName; modal.style.display="flex"; }
 function closeModal() { modal.style.display="none"; }
 function confirmBooking() { alert(`Ваша запись подтверждена!\nУслуга: ${modalService.value}\nФилиал: ${modalBranch.value}\nМастер: ${modalMaster.value}`); closeModal(); }
 
-// Breadcrumb update
+/* ===========================
+   Хлебные крошки
+=========================== */
 const crumbs=document.querySelectorAll(".menu a");
 const crumbCurrent=document.getElementById("crumb-current");
-crumbs.forEach(c=>{c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}}));
+crumbs.forEach(c => c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}));
 
+/* ===========================
+   Инициализация
+=========================== */
+renderCards();
 </script>
 
 </body>
