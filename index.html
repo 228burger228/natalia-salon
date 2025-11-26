@@ -121,7 +121,482 @@
 </script>
 
 <!-- React App File -->
-<script type="text/babel" src="NataliaSalon.jsx"></script>
+<script type="text/babel" src="NataliaSalon.js"></script>
+  <script type="text/babel">
+  import React, { useState, useMemo } from "react";
+
+// Single-file React component for "Наталья" beauty salon landing
+// Uses Tailwind CSS classes. Default export at bottom.
+
+const CATEGORIES = [
+  {
+    id: "manicure",
+    title: "Маникюр",
+    services: Array.from({ length: 10 }).map((_, i) => ({
+      id: `man-${i + 1}`,
+      name: `Классический маникюр ${i + 1}`,
+      description:
+        "Аккуратная обработка кутикулы, пилочка, нанесение лака. Идеально подходит для повседневного образа.",
+      price: 800 + i * 50,
+      img: null,
+    })),
+  },
+  {
+    id: "pedicure",
+    title: "Педикюр",
+    services: Array.from({ length: 10 }).map((_, i) => ({
+      id: `ped-${i + 1}`,
+      name: `Европейский педикюр ${i + 1}`,
+      description:
+        "Комфортная процедура с расслабляющей ванночкой и покрытием. Подходит для чувствительных ног.",
+      price: 1200 + i * 60,
+      img: null,
+    })),
+  },
+  {
+    id: "hair",
+    title: "Прически",
+    services: Array.from({ length: 12 }).map((_, i) => ({
+      id: `hair-${i + 1}`,
+      name: `Сложная прическа ${i + 1}`,
+      description:
+        "Авторская прическа для мероприятий: фиксация, украшения по желанию клиента.",
+      price: 1800 + i * 150,
+      img: null,
+    })),
+  },
+  {
+    id: "makeup",
+    title: "Макияж",
+    services: Array.from({ length: 11 }).map((_, i) => ({
+      id: `make-${i + 1}`,
+      name: `Вечерний макияж ${i + 1}`,
+      description:
+        "Профессиональный макияж с учётом цветотипа и особенностей лица, стойкие материалы.",
+      price: 1500 + i * 120,
+      img: null,
+    })),
+  },
+  {
+    id: "care",
+    title: "Уход за красотой",
+    services: Array.from({ length: 10 }).map((_, i) => ({
+      id: `care-${i + 1}`,
+      name: `Уходовая процедура ${i + 1}`,
+      description:
+        "Комплексный уход за кожей/тельцом с использованием профессиональных средств.",
+      price: 1000 + i * 100,
+      img: null,
+    })),
+  },
+];
+
+const MASTERS = Array.from({ length: 12 }).map((_, i) => ({
+  id: `m-${i + 1}`,
+  name: ["Анастасия", "Екатерина", "Мария", "Ольга", "Ирина", "Наталья", "Светлана", "Олеся", "Татьяна", "Виктория", "Людмила", "Ксения"][i % 12] + ` ${i + 1}`,
+  experience: `${2 + (i % 15)} лет`, // sample
+  categories: (() => {
+    if (i % 5 === 0) return ["Маникюр"];
+    if (i % 5 === 1) return ["Педикюр"];
+    if (i % 5 === 2) return ["Прически"];
+    if (i % 5 === 3) return ["Макияж"];
+    return ["Уход за красотой"];
+  })(),
+  img: null,
+}));
+
+const BRANCHES = [
+  {
+    id: "b1",
+    name: "Наталья — Центр",
+    address: "ул. Ленина, 10",
+    metro: ["Центральная"],
+    photos: [],
+    mapQuery: "ул. Ленина, 10",
+  },
+  {
+    id: "b2",
+    name: "Наталья — Садовая",
+    address: "с-б Садовая, 5",
+    metro: ["Садовая"],
+    photos: [],
+    mapQuery: "Садовая, 5",
+  },
+  {
+    id: "b3",
+    name: "Наталья — Победа",
+    address: "пр. Победы, 24",
+    metro: ["Победа"],
+    photos: [],
+    mapQuery: "пр. Победы, 24",
+  },
+  {
+    id: "b4",
+    name: "Наталья — Невский",
+    address: "наб. Невы, 3",
+    metro: ["Невский"],
+    photos: [],
+    mapQuery: "наб. Невы, 3",
+  },
+  {
+    id: "b5",
+    name: "Наталья — Северный",
+    address: "ул. Северная, 16",
+    metro: ["Северная"],
+    photos: [],
+    mapQuery: "ул. Северная, 16",
+  },
+];
+
+// Utils
+const formatPrice = (p) => `${p} ₽`;
+
+function BookingModal({ open, onClose, servicesData, masters, branches }) {
+  const [lines, setLines] = useState([
+    { id: cryptoSafeId(), categoryId: servicesData[0].id, serviceId: servicesData[0].services[0].id, branchId: branches[0].id, masterId: masters[0].id },
+  ]);
+  const [clientName, setClientName] = useState("");
+  const [contact, setContact] = useState("");
+  const [dateTime, setDateTime] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+
+  const addLine = () => {
+    setLines((s) => [...s, { id: cryptoSafeId(), categoryId: servicesData[0].id, serviceId: servicesData[0].services[0].id, branchId: branches[0].id, masterId: masters[0].id }]);
+  };
+
+  const updateLine = (id, patch) => {
+    setLines((s) => s.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  };
+
+  const removeLine = (id) => {
+    setLines((s) => s.filter((l) => l.id !== id));
+  };
+
+  const total = useMemo(() => {
+    return lines.reduce((sum, l) => {
+      const cat = servicesData.find((c) => c.id === l.categoryId);
+      if (!cat) return sum;
+      const svc = cat.services.find((x) => x.id === l.serviceId);
+      if (!svc) return sum;
+      return sum + svc.price;
+    }, 0);
+  }, [lines, servicesData]);
+
+  const handleSubmit = () => {
+    // Here would be API call. We'll just simulate confirmation.
+    setConfirmed(true);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-auto max-h-[90dvh]">
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold">Запись на услугу</h3>
+            <button onClick={onClose} className="text-gray-500">Закрыть ✕</button>
+          </div>
+
+          <div className="mt-4 space-y-4">
+            {lines.map((line, idx) => {
+              const category = servicesData.find((c) => c.id === line.categoryId);
+              const services = category ? category.services : servicesData[0].services;
+              const service = services.find((s) => s.id === line.serviceId) || services[0];
+
+              return (
+                <div key={line.id} className="border rounded-lg p-3">
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium">Категория</label>
+                      <select value={line.categoryId} onChange={(e) => updateLine(line.id, { categoryId: e.target.value, serviceId: servicesData.find(c=>c.id===e.target.value).services[0].id })} className="mt-1 block w-full rounded-md border p-2">
+                        {servicesData.map((c) => (
+                          <option key={c.id} value={c.id}>{c.title}</option>
+                        ))}
+                      </select>
+
+                      <label className="block text-sm font-medium mt-3">Услуга</label>
+                      <select value={line.serviceId} onChange={(e) => updateLine(line.id, { serviceId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
+                        {services.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} — {formatPrice(s.price)}</option>
+                        ))}
+                      </select>
+
+                      <label className="block text-sm font-medium mt-3">Филиал</label>
+                      <select value={line.branchId} onChange={(e) => updateLine(line.id, { branchId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
+                        {branches.map((b) => <option key={b.id} value={b.id}>{b.name} — {b.address}</option>)}
+                      </select>
+
+                      <label className="block text-sm font-medium mt-3">Мастер</label>
+                      <select value={line.masterId} onChange={(e) => updateLine(line.id, { masterId: e.target.value })} className="mt-1 block w-full rounded-md border p-2">
+                        {masters.map((m) => (
+                          <option key={m.id} value={m.id}>{m.name} — {m.categories.join(", ")}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="w-40 text-right">
+                      <div className="text-sm text-gray-500">Цена</div>
+                      <div className="text-lg font-semibold mt-2">{formatPrice(service.price)}</div>
+
+                      <button onClick={() => removeLine(line.id)} className="mt-4 text-sm text-red-600">Удалить</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            <div>
+              <button onClick={addLine} className="inline-flex items-center gap-2 px-3 py-2 rounded-md border">
+                <span className="text-xl">＋</span> Добавить услугу
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium">Дата и время</label>
+                <input type="datetime-local" value={dateTime} onChange={(e) => setDateTime(e.target.value)} className="mt-1 block w-full rounded-md border p-2" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Контактные данные</label>
+                <input placeholder="Имя" value={clientName} onChange={(e) => setClientName(e.target.value)} className="mt-1 block w-full rounded-md border p-2" />
+                <input placeholder="Телефон или email" value={contact} onChange={(e) => setContact(e.target.value)} className="mt-2 block w-full rounded-md border p-2" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div>
+                <div className="text-sm text-gray-500">Итого</div>
+                <div className="text-2xl font-bold">{formatPrice(total)}</div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button onClick={onClose} className="px-4 py-2 rounded-md border">Отмена</button>
+                <button onClick={handleSubmit} className="px-4 py-2 rounded-md bg-black text-white">Записаться</button>
+              </div>
+            </div>
+
+            {confirmed && (
+              <div className="mt-4 p-3 rounded-md bg-green-50 border border-green-200">
+                <div className="font-semibold">Ваша запись подтверждена</div>
+                <div className="text-sm text-gray-700">Мы отправим подтверждение на указанные контакты. Спасибо!</div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function cryptoSafeId() {
+  // Simple id generator that does not rely on window.crypto in all environments
+  return `id-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+export default function SalonNatalya() {
+  const [bookingOpen, setBookingOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-40">
+        <div className="container mx-auto flex items-center justify-between p-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center font-bold">N</div>
+            <div>
+              <div className="font-semibold">Наталья</div>
+              <div className="text-xs text-gray-500">Салон красоты</div>
+            </div>
+          </div>
+
+          <nav className="hidden md:flex gap-6 items-center">
+            <a className="hover:underline" href="#services">Услуги</a>
+            <a className="hover:underline" href="#masters">Мастера</a>
+            <a className="hover:underline" href="#branches">Филиалы</a>
+            <a className="hover:underline" href="#contacts">Контакты</a>
+            <a className="hover:underline" href="#blog">Блог</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <button onClick={() => setBookingOpen(true)} className="px-4 py-2 rounded-md bg-pink-600 text-white">Записаться</button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center gap-8">
+        <div className="flex-1">
+          <div className="text-sm uppercase text-pink-600 font-medium">Салон красоты</div>
+          <h1 className="text-4xl md:text-5xl font-bold mt-2">Наталья — ваша красота в заботливых руках</h1>
+          <p className="mt-4 text-gray-700 max-w-xl">Мы верим, что красота — это индивидуальность и небольшие ритуалы, которые делают каждый день лучше. Профессиональные мастера, приятная атмосфера и высокое качество сервисов.</p>
+
+          <div className="mt-6 flex gap-3">
+            <button onClick={() => setBookingOpen(true)} className="px-5 py-3 rounded-md bg-black text-white">Записаться</button>
+            <a href="#services" className="px-5 py-3 rounded-md border">Услуги</a>
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/3 bg-pink-50 rounded-2xl p-6 flex items-center justify-center">
+          {/* logo / visual placeholder */}
+          <div className="text-center">
+            <div className="w-36 h-36 rounded-full bg-white shadow-md mx-auto flex items-center justify-center text-3xl font-bold">N</div>
+            <div className="mt-3 text-sm text-gray-600">Логотип, слоган и визуальная концепция из брендбука</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
+      <section id="services" className="container mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold">Категории услуг</h2>
+        <p className="text-gray-600 mt-2">Выберите категорию и ознакомьтесь с примерами услуг. В каждой карточке — краткое описание, фото-пример, цена и кнопка записи.</p>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {CATEGORIES.map((cat) => (
+            <div key={cat.id} className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{cat.title}</h3>
+                  <div className="text-sm text-gray-500">Примерный перечень услуг</div>
+                </div>
+                <div className="text-sm text-gray-600">{cat.services.length} услуг</div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {cat.services.map((s) => (
+                  <div key={s.id} className="border rounded-lg overflow-hidden flex">
+                    <div className="w-28 h-28 bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400">Фото</div>
+                    <div className="p-3 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="font-medium">{s.name}</div>
+                        <div className="text-sm text-gray-600 mt-1">{s.description}</div>
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="font-semibold">{formatPrice(s.price)}</div>
+                        <button onClick={() => setBookingOpen(true)} className="text-sm px-3 py-1 rounded-md border">Записаться</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Masters */}
+      <section id="masters" className="container mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold">Наши мастера</h2>
+        <p className="text-gray-600 mt-2">Профессиональная команда: ФИО, стаж и специализация.</p>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {MASTERS.map((m) => (
+            <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+              <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">Фото</div>
+              <div className="font-semibold">{m.name}</div>
+              <div className="text-sm text-gray-600">Стаж: {m.experience}</div>
+              <div className="text-sm text-gray-600">Специализация: {m.categories.join(", ")}</div>
+              <div className="mt-3">
+                <button onClick={() => setBookingOpen(true)} className="w-full px-4 py-2 rounded-md border">Записаться к мастеру</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Branches */}
+      <section id="branches" className="container mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold">Филиалы</h2>
+        <p className="text-gray-600 mt-2">Пять филиалов салона "Наталья" с адресами, фотографиями и метками метро.</p>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {BRANCHES.map((b) => (
+            <div key={b.id} className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="w-36 h-24 bg-gray-100 flex-shrink-0 rounded-md flex items-center justify-center text-gray-400">Фото</div>
+                <div>
+                  <div className="font-semibold">{b.name}</div>
+                  <div className="text-sm text-gray-600">{b.address}</div>
+                  <div className="text-sm text-gray-600 mt-1">Ближайшие станции метро: {b.metro.join(", ")}</div>
+                  <div className="mt-3 flex gap-2">
+                    <a className="text-sm underline" href={`https://maps.google.com?q=${encodeURIComponent(b.mapQuery)}`} target="_blank" rel="noreferrer">Посмотреть на карте</a>
+                    <button onClick={() => setBookingOpen(true)} className="text-sm px-3 py-1 rounded-md border">Записаться</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="w-full h-24 bg-gray-50 rounded-md flex items-center justify-center text-gray-400">Интерьер</div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="contacts" className="bg-black text-white py-10 mt-12">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center font-bold">N</div>
+              <div>
+                <div className="font-semibold">Наталья</div>
+                <div className="text-sm">Салон красоты</div>
+              </div>
+            </div>
+
+            <div className="mt-4 text-sm text-gray-300">© {new Date().getFullYear()} Наталья. Все права защищены.</div>
+          </div>
+
+          <div>
+            <div className="font-semibold">Соцсети и мессенджеры</div>
+            <ul className="mt-3 text-sm text-gray-300 space-y-2">
+              <li>Instagram</li>
+              <li>VK</li>
+              <li>WhatsApp</li>
+              <li>Telegram</li>
+              <li>Viber</li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="font-semibold">Полезно покупателям</div>
+            <ul className="mt-3 text-sm text-gray-300 space-y-2">
+              <li>Акции и скидки</li>
+              <li>Бонусная программа</li>
+              <li>Подарочные сертификаты</li>
+              <li>Блог</li>
+              <li>Вопрос-ответ</li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="font-semibold">Партнёрам</div>
+            <ul className="mt-3 text-sm text-gray-300 space-y-2">
+              <li>Франчайзинг</li>
+              <li>Поставщики</li>
+              <li>Корпоративным клиентам</li>
+              <li>Сотрудничество</li>
+              <li>Контакты</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 mt-6 text-xs text-gray-400">Соглашение с политикой конфиденциальности и обработкой персональных данных. Соглашение на сбор файлов cookie.</div>
+      </footer>
+
+      {/* Booking modal component (mounted once) */}
+      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} servicesData={CATEGORIES} masters={MASTERS} branches={BRANCHES} />
+    </div>
+  );
+}
+
+</script>
 
 </body>
 </html>
