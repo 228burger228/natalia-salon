@@ -109,23 +109,98 @@
 </footer>
 
 <!-- Modal -->
-<div class="modal" id="modal">
-  <div class="modal-content">
+<div class="modal" id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="modal-content" style="background:white; padding:20px; width:380px; border-radius:10px;">
     <h3>Запись на услугу</h3>
+
     <label>Услуга:</label>
     <select id="modal-service"></select>
+
     <label>Филиал:</label>
     <select id="modal-branch"></select>
+
     <label>Мастер:</label>
     <select id="modal-master"></select>
+
     <label>Дата и время:</label>
     <input type="datetime-local" id="modal-datetime">
+
     <label>Контактные данные:</label>
     <input type="text" id="modal-contact" placeholder="Имя, телефон или почта">
+
     <button class="btn" onclick="confirmBooking()">Записаться</button>
     <button class="close" onclick="closeModal()">Закрыть</button>
   </div>
 </div>
+
+<script>
+/* Открытие и закрытие модалки */
+function openModal() {
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+/* Заполнение select'ов модалки */
+function populateModal() {
+  const serviceSelect = document.getElementById('modal-service');
+  const branchSelect = document.getElementById('modal-branch');
+  const masterSelect = document.getElementById('modal-master');
+
+  // Услуги
+  serviceSelect.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    cat.services.forEach(svc => {
+      const opt = document.createElement('option');
+      opt.value = `${cat.title} — ${svc.name} — ${svc.price}₽`;
+      opt.textContent = `${cat.title} — ${svc.name} — ${svc.price}₽`;
+      serviceSelect.appendChild(opt);
+    });
+  });
+
+  // Филиалы
+  branchSelect.innerHTML = '';
+  BRANCHES.forEach(branch => {
+    const opt = document.createElement('option');
+    opt.value = branch.name;
+    opt.textContent = branch.name + ' — ' + branch.address;
+    branchSelect.appendChild(opt);
+  });
+
+  // Мастера
+  masterSelect.innerHTML = '';
+  MASTERS.forEach(master => {
+    const opt = document.createElement('option');
+    opt.value = master.name;
+    opt.textContent = master.name + ' — ' + master.categories.join(", ");
+    masterSelect.appendChild(opt);
+  });
+}
+
+/* Подтверждение записи */
+function confirmBooking() {
+  const service = document.getElementById('modal-service').value;
+  const branch = document.getElementById('modal-branch').value;
+  const master = document.getElementById('modal-master').value;
+  const datetime = document.getElementById('modal-datetime').value;
+  const contact = document.getElementById('modal-contact').value;
+
+  if (!service || !branch || !master || !datetime || !contact) {
+    alert('Пожалуйста, заполните все поля.');
+    return;
+  }
+
+  alert(`Запись подтверждена!\nУслуга: ${service}\nФилиал: ${branch}\nМастер: ${master}\nДата: ${datetime}\nКонтакты: ${contact}`);
+  closeModal();
+}
+
+/* Заполняем select при открытии модалки */
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target.id === 'modal') populateModal();
+});
+</script>
+
 <script>
 /* ===========================
    Категории услуг
