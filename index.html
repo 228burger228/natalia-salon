@@ -193,7 +193,142 @@ function confirmBooking() { alert(`Ваша запись подтвержден�
 const crumbs=document.querySelectorAll(".menu a");
 const crumbCurrent=document.getElementById("crumb-current");
 crumbs.forEach(c=>{c.addEventListener("click",()=>{crumbCurrent.textContent=c.textContent;}}));
+/* ===========================
+   Категории услуг
+=========================== */
+const CATEGORIES = [
+  {
+    id: "manicure",
+    title: "Маникюр",
+    services: [
+      { name: "Классический маникюр", description: "Обработка кутикулы, пилочка, лак.", price: 800, img: "https://source.unsplash.com/200x200/?manicure,1" },
+      { name: "Аппаратный маникюр", description: "Аккуратная обработка с помощью аппарата.", price: 1000, img: "https://source.unsplash.com/200x200/?manicure,2" },
+      { name: "Французский маникюр", description: "Нежный френч, стойкий результат.", price: 1200, img: "https://source.unsplash.com/200x200/?manicure,3" },
+      { name: "Дизайн ногтей", description: "Рисунки, стразы, камифубуки.", price: 1500, img: "https://source.unsplash.com/200x200/?manicure,4" },
+      { name: "Укрепление ногтей", description: "Гель или биогель для прочности.", price: 1400, img: "https://source.unsplash.com/200x200/?manicure,5" }
+    ]
+  },
+  {
+    id: "pedicure",
+    title: "Педикюр",
+    services: [
+      { name: "Классический педикюр", description: "Ванночка, обработка ногтей.", price: 1000, img: "https://source.unsplash.com/200x200/?pedicure,1" },
+      { name: "Европейский педикюр", description: "Мягкая обработка, покрытие.", price: 1200, img: "https://source.unsplash.com/200x200/?pedicure,2" },
+      { name: "Аппаратный педикюр", description: "Удаление мозолей безопасно.", price: 1300, img: "https://source.unsplash.com/200x200/?pedicure,3" },
+      { name: "SPA педикюр", description: "Скраб, маска, массаж.", price: 1500, img: "https://source.unsplash.com/200x200/?pedicure,4" }
+    ]
+  },
+  {
+    id: "hair",
+    title: "Прически",
+    services: [
+      { name: "Повседневная прическа", description: "Для работы или прогулки.", price: 1500, img: "https://source.unsplash.com/200x200/?hair,1" },
+      { name: "Вечерняя прическа", description: "Для торжественных событий.", price: 2000, img: "https://source.unsplash.com/200x200/?hair,2" },
+      { name: "Свадебная прическа", description: "С укладкой и украшениями.", price: 3500, img: "https://source.unsplash.com/200x200/?hair,3" },
+      { name: "Плетения и косы", description: "Сложные варианты и плетения.", price: 1800, img: "https://source.unsplash.com/200x200/?hair,4" }
+    ]
+  },
+  {
+    id: "makeup",
+    title: "Макияж",
+    services: [
+      { name: "Дневной макияж", description: "Естественный и свежий.", price: 1200, img: "https://source.unsplash.com/200x200/?makeup,1" },
+      { name: "Вечерний макияж", description: "Яркие акценты, стойкий результат.", price: 1500, img: "https://source.unsplash.com/200x200/?makeup,2" },
+      { name: "Свадебный макияж", description: "Фотогеничный и стойкий.", price: 2500, img: "https://source.unsplash.com/200x200/?makeup,3" },
+      { name: "Коррекция бровей и ресниц", description: "Коррекция и окрашивание.", price: 800, img: "https://source.unsplash.com/200x200/?makeup,4" }
+    ]
+  },
+  {
+    id: "care",
+    title: "Уход за красотой",
+    services: [
+      { name: "Уход за кожей лица", description: "Очищение, маска, массаж.", price: 1000, img: "https://source.unsplash.com/200x200/?spa,1" },
+      { name: "Уход за телом", description: "Скраб и увлажнение кожи.", price: 1200, img: "https://source.unsplash.com/200x200/?spa,2" },
+      { name: "SPA программы", description: "Расслабляющие процедуры.", price: 2000, img: "https://source.unsplash.com/200x200/?spa,3" },
+      { name: "Массаж лица и шеи", description: "Снятие напряжения, тонизирование.", price: 800, img: "https://source.unsplash.com/200x200/?spa,4" }
+    ]
+  }
+];
 
+/* ===========================
+   Наши мастера
+=========================== */
+const MASTERS = [
+  { name: "Анастасия Смирнова", categories: ["Маникюр", "Дизайн ногтей"], experience: "5 лет", img: "https://source.unsplash.com/100x100/?woman,1" },
+  { name: "Екатерина Иванова", categories: ["Педикюр"], experience: "6 лет", img: "https://source.unsplash.com/100x100/?woman,2" },
+  { name: "Мария Кузнецова", categories: ["Прически"], experience: "8 лет", img: "https://source.unsplash.com/100x100/?woman,3" },
+  { name: "Ольга Петрова", categories: ["Макияж"], experience: "7 лет", img: "https://source.unsplash.com/100x100/?woman,4" },
+  { name: "Ирина Соколова", categories: ["SPA", "Уход за телом"], experience: "10 лет", img: "https://source.unsplash.com/100x100/?woman,5" },
+  { name: "Наталья Федорова", categories: ["Маникюр", "Педикюр"], experience: "9 лет", img: "https://source.unsplash.com/100x100/?woman,6" },
+  { name: "Светлана Васильева", categories: ["Прически", "Вечерние укладки"], experience: "6 лет", img: "https://source.unsplash.com/100x100/?woman,7" },
+  { name: "Олеся Попова", categories: ["Макияж"], experience: "4 года", img: "https://source.unsplash.com/100x100/?woman,8" },
+  { name: "Татьяна Михайлова", categories: ["SPA"], experience: "5 лет", img: "https://source.unsplash.com/100x100/?woman,9" },
+  { name: "Виктория Новикова", categories: ["Маникюр"], experience: "3 года", img: "https://source.unsplash.com/100x100/?woman,10" }
+];
+
+/* ===========================
+   Филиалы салона
+=========================== */
+const BRANCHES = [
+  {
+    name: "Наталья — Центр",
+    address: "ул. Ленина, 10",
+    metro: ["Центральная"],
+    photos: [
+      "https://source.unsplash.com/200x150/?salon,1",
+      "https://source.unsplash.com/200x150/?salon,2",
+      "https://source.unsplash.com/200x150/?salon,3",
+      "https://source.unsplash.com/200x150/?salon,4"
+    ],
+    mapQuery: "ул. Ленина, 10"
+  },
+  {
+    name: "Наталья — Садовая",
+    address: "с-б Садовая, 5",
+    metro: ["Садовая"],
+    photos: [
+      "https://source.unsplash.com/200x150/?salon,5",
+      "https://source.unsplash.com/200x150/?salon,6",
+      "https://source.unsplash.com/200x150/?salon,7",
+      "https://source.unsplash.com/200x150/?salon,8"
+    ],
+    mapQuery: "с-б Садовая, 5"
+  },
+  {
+    name: "Наталья — Победа",
+    address: "пр. Победы, 24",
+    metro: ["Победа"],
+    photos: [
+      "https://source.unsplash.com/200x150/?salon,9",
+      "https://source.unsplash.com/200x150/?salon,10",
+      "https://source.unsplash.com/200x150/?salon,11",
+      "https://source.unsplash.com/200x150/?salon,12"
+    ],
+    mapQuery: "пр. Победы, 24"
+  },
+  {
+    name: "Наталья — Невский",
+    address: "наб. Невы, 3",
+    metro: ["Невский"],
+    photos: [
+      "https://source.unsplash.com/200x150/?salon,13",
+      "https://source.unsplash.com/200x150/?salon,14",
+      "https://source.unsplash.com/200x150/?salon,15"
+    ],
+    mapQuery: "наб. Невы, 3"
+  },
+  {
+    name: "Наталья — Северный",
+    address: "ул. Северная, 16",
+    metro: ["Северная"],
+    photos: [
+      "https://source.unsplash.com/200x150/?salon,16",
+      "https://source.unsplash.com/200x150/?salon,17",
+      "https://source.unsplash.com/200x150/?salon,18"
+    ],
+    mapQuery: "ул. Северная, 16"
+  }
+];
 </script>
 
 </body>
